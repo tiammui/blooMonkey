@@ -15,10 +15,10 @@ var monkey = (function(){
   var prevFocus = [];
 
   /**
-   * Info about the branch with focus or the presently active floor element
-   * @type {Monkey.PresentBranch|Monkey.floorElem}
+   * Info about the branch with focus or null if the presently active element is a floor Element
+   * @type {Partial<Monkey.Branch>|null}
    */
-  var presentBranch = {};
+  var presentBranch = null;
 
 
 
@@ -28,16 +28,71 @@ var monkey = (function(){
   /**
    * pass the event listener needed to trap focus in a modal or dropdown
    */
-  function climbingFunc(){
+  function climbingFunc(isDropDown){
 
+    // todo: remember to write code that update `presentBranch.focusedElement`,
+
+    // Remove previous listener, 
+    // // I remove the two to prevent the stress of checking if previous branch was a 'modal' or 'dropdown'
+    document.removeEventListener('keydown', dropDownListener)
+    document.removeEventListener('keydown', modalListener)
+
+    if(isDropDown){
+      // add dropdown key sequence
+      document.addEventListener('keydown', dropDownListener);      
+    } else {
+      // add modal key sequence
+      document.addEventListener('keydown', modalListener);      
+    }
   }
 
   /**
-   * remove the event listener that trap focus to a modal
+   * remove the event listener that trap focus to a branch
    */
   function decendingFunc(){
+    // remove previous listener and add appropriate listener if focus decend on another branch
+    // make `presentBranch`===null on focus decending on floor
+  }
+
+  /**
+   * 
+   * @param {KeyboardEvent} e 
+   * @return 
+   */
+  function modalListener(e){
+    // todo: remember to write code that update `presentBranch.focusedElement`,
+
+    var isTabPressed = e.key === 'Tab' || e.keyCode === 9;
+    var firstFocusableElement = presentBranch.firstFocusableElement;
+    var lastFocusableElement = presentBranch.lastFocusableElement;
+
+    if (!isTabPressed) {
+      return;
+    }
+  
+    if (e.shiftKey) { // if shift key pressed for shift + tab combination
+      if (document.activeElement === firstFocusableElement) {
+        lastFocusableElement.focus(); // add focus for the last focusable element
+        e.preventDefault();
+      }
+    } else { // if tab key is pressed
+      if (document.activeElement === lastFocusableElement) { // if focused has reached to last focusable element then focus first focusable element after pressing tab
+        firstFocusableElement.focus(); // add focus for the first focusable element
+        e.preventDefault();
+      }
+    }
+  }
+
+  /**
+   * 
+   * @param {KeyboardEvent} e 
+   * @return 
+   */
+  function dropDownListener(e){
+    // todo: remember to write code that update `presentBranch.focusedElement`,
 
   }
+
 
   
 
@@ -45,7 +100,7 @@ var monkey = (function(){
   /**
    * Return the active element if focus is on any floor element, but return branch info if active element is on a branch
    * 
-   * @return {{level:'floor'|'branch',branch:Monkey.PresentBranch,element:Monkey.floorElem}}
+   * @return {Monkey.Active}
    */
   function active(){
 
@@ -72,6 +127,9 @@ var monkey = (function(){
    */
   function climb(direction, branchElement, isDropdown){
     
+    // Validation of `branchElement`
+    if(!(branchElement instanceof Element)) return console.error("No Branch to climb");
+
     if(direction===true || direction==='up'){
       // if climbing up
 
@@ -102,8 +160,12 @@ var monkey = (function(){
       presentBranch = {
         firstFocusableElement:branchElement,
         lastFocusableElement:focusableElements[focusableElements.length-1],
-        focusedElement:branchElement
+        focusedElement:branchElement,
+        type:isDropdown?'dropdown':'modal',
       };
+
+      // Add KEYDOWN event listener
+      climbingFunc(isDropdown)
 
     } else {
       // if going down

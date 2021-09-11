@@ -1,14 +1,30 @@
 
 type floorElement = HTMLElement;
+interface ActiveInfo{
+  level:'floor'|'branch',
+  /**
+   * Present Branch with focus
+   * 
+   * Is available if `ActiveInfo.level` === "branch"
+   */
+  branch:BranchInfo,
+  /**
+   * Present Element with focus
+   * 
+   * Is available if `ActiveInfo.level` === "floor"
+   */
+  element:Monkey.floorElem
+}
+
 
 /**
  * Branch info
  */
-interface Branch {
-  firstFocusableElement?:HTMLElement,
-  lastFocusableElement?:HTMLElement,
-  focusedElement?:HTMLElement
-  
+interface BranchInfo {
+  firstFocusableElement:HTMLElement,
+  lastFocusableElement:HTMLElement,
+  focusedElement:HTMLElement
+  type:'modal'|'dropdown'
 }
 
 /**
@@ -32,16 +48,18 @@ interface MONKEY{
  *  it use for development of the module only
  */
 namespace Monkey{
-  export type PresentBranch = Branch;
+  export type Branch = BranchInfo;
 
   /**
    * Contain branches to return focus to on calling of `monkey.decend()`
    * 
    * first index contain the floor Element to return focus to, unlike the remaining index that contain Branches object
    */
-  export type PreviousFocusables = [floorElement,...Branch[]];
+  export type PreviousFocusables = [floorElement,...BranchInfo[]];
 
   export type floorElem = floorElement;
+
+  export type Active = ActiveInfo;
 }
 
 export {MONKEY,Monkey}

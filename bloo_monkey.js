@@ -7,7 +7,7 @@ const modal = document.querySelector('#exampleModal'); // select the modal by it
 const firstFocusableElement = modal.querySelectorAll(focusableElements)[0]; // get first element to be focused inside modal
 const focusableContent = modal.querySelectorAll(focusableElements);
 const lastFocusableElement = focusableContent[focusableContent.length - 1]; // get last element to be focused inside modal
-
+ 
 
 document.addEventListener('keydown', function(e) {
   let isTabPressed = e.key === 'Tab' || e.keyCode === 9;
